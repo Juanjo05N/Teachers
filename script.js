@@ -57,6 +57,13 @@ function showCareerSection() {
   document.getElementById("login-section").classList.add("hidden");
   document.getElementById("career-section").classList.remove("hidden");
   document.getElementById("main-section").classList.add("hidden");
+
+  // Reset current career when going back to career selection
+  currentCareer = null;
+  currentCourse = null;
+
+  // Cerrar peek si está abierto
+  closePeek();
 }
 
 // Show main section (curriculum)
@@ -103,7 +110,14 @@ function logout() {
   closePeek();
 }
 
-// Career loading functionality
+// NUEVA FUNCIÓN: Botón para volver a selección de carreras
+function backToCareerSelection() {
+  showCareerSection();
+  // Limpiar el curriculum cuando volvemos
+  document.getElementById("curriculum").innerHTML = "";
+}
+
+// Career loading functionality - MODIFICADO
 function loadCareer(career) {
   currentCareer = career;
   const modal = document.getElementById("careerModal");
@@ -126,7 +140,7 @@ function loadCareer(career) {
       </div>
     `;
 
-    // Activar clics en las materias
+    // Activar clics en las materias - MODIFICADO para mostrar directamente la malla curricular
     setTimeout(() => {
       document.querySelectorAll(".materia").forEach((materia) => {
         materia.addEventListener("click", () => {
@@ -135,8 +149,8 @@ function loadCareer(career) {
           closeModal();
           showMainSection("Ingeniería Civil");
 
-          // Crear curriculum dinámico para esta carrera
-          createCurriculumForCareer("civil");
+          // CAMBIO CLAVE: Mostrar la malla curricular completa y abrir el peek encima
+          showFullCurriculumForCareer("civil");
 
           // Abrir directamente la evaluación de profesores para esta materia
           setTimeout(() => {
@@ -162,14 +176,14 @@ function loadCareer(career) {
       </div>
     `;
 
-    // Activar clics para sistemas
+    // Activar clics para sistemas - MODIFICADO
     setTimeout(() => {
       modalBody.querySelectorAll(".course").forEach((course) => {
         course.addEventListener("click", () => {
           currentCourse = course.dataset.course;
           closeModal();
           showMainSection("Ingeniería de Sistemas");
-          createCurriculumForCareer("sistemas");
+          showFullCurriculumForCareer("sistemas");
           setTimeout(() => {
             showProfessorsForCourse(currentCourse);
           }, 100);
@@ -187,12 +201,18 @@ function loadCareer(career) {
   modal.style.display = "block";
 }
 
-// Crear curriculum dinámico basado en la carrera
-function createCurriculumForCareer(career) {
+// FUNCIÓN SIMPLIFICADA: Mostrar curriculum completo
+function showFullCurriculumForCareer(career) {
   const curriculum = document.getElementById("curriculum");
 
+  let curriculumHTML = `
+    <div style="margin-bottom: 20px;">
+      <button onclick="backToCareerSelection()" style="background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer;">← Volver a Carreras</button>
+    </div>
+  `;
+
   if (career === "civil") {
-    curriculum.innerHTML = `
+    curriculumHTML += `
       <div class="course" data-course="calculo-diferencial">Cálculo Diferencial</div>
       <div class="course" data-course="geometria">Geometría</div>
       <div class="course" data-course="biologia-i">Biología I</div>
@@ -202,19 +222,29 @@ function createCurriculumForCareer(career) {
       <div class="course" data-course="introduccion-ingenieria">Introducción a la Ingeniería</div>
     `;
   } else if (career === "sistemas") {
-    curriculum.innerHTML = `
+    curriculumHTML += `
       <div class="course" data-course="programacion-basica">Programación Básica</div>
       <div class="course" data-course="estructuras-datos">Estructuras de Datos</div>
     `;
   }
 
+  curriculum.innerHTML = curriculumHTML;
+
   // Agregar event listeners a las materias
   curriculum.querySelectorAll(".course").forEach((course) => {
-    course.addEventListener("click", () => {
-      currentCourse = course.dataset.course;
-      showProfessorsForCourse(currentCourse);
-    });
+    if (!course.onclick) {
+      // Evitar duplicar event listeners en el botón
+      course.addEventListener("click", () => {
+        currentCourse = course.dataset.course;
+        showProfessorsForCourse(currentCourse);
+      });
+    }
   });
+}
+
+// Mantener la función original por compatibilidad
+function createCurriculumForCareer(career) {
+  showFullCurriculumForCareer(career);
 }
 
 // Obtener nombre legible de la materia
@@ -240,7 +270,7 @@ function closeModal() {
   modal.style.display = "none";
 }
 
-// Center peek functionality
+// Center peek functionality - MODIFICADO
 const peek = document.getElementById("center-peek");
 const peekBody = document.getElementById("peek-body");
 const peekClose = document.querySelector(".peek-close");
@@ -250,6 +280,7 @@ peekClose.onclick = closePeek;
 function closePeek() {
   peek.classList.add("hidden");
   peekBody.innerHTML = "";
+  // No hacer nada más - la malla curricular permanece visible debajo
 }
 
 function showProfessorsForCourse(courseId) {
