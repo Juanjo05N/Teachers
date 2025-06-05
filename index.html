@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Professor Evaluation</title>
+    <title>Evaluación de Profesores</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
@@ -13,53 +13,18 @@
 
     <main>
       <section id="curriculum">
-        <!-- We'll insert the curriculum map here (basic version first) -->
         <div class="course" data-course="calculo-diferencial">
           Cálculo Diferencial
         </div>
         <div class="course" data-course="geometria">Geometría</div>
-        <!-- Add more later -->
       </section>
     </main>
-    <!-- Evaluation Modal -->
-    <div id="modal" class="modal hidden">
-      <div class="modal-content">
-        <span class="close-button">&times;</span>
-        <h2>Evaluar Profesor</h2>
-        <form id="evaluation-form">
-          <label for="existing-professors"
-            >Selecciona un Profesor existente:</label
-          >
-          <select id="existing-professors">
-            <option value="">-- Otro / Nuevo --</option>
-          </select>
-          <label for="professor-name">Nombre del Profesor:</label>
-          <input
-            type="text"
-            id="professor-name"
-            name="professor-name"
-            required
-          />
 
-          <label for="rating">Calificación (1 a 5):</label>
-          <select id="rating" name="rating" required>
-            <option value="">Selecciona</option>
-            <option value="1">1 - Muy Malo</option>
-            <option value="2">2 - Malo</option>
-            <option value="3">3 - Regular</option>
-            <option value="4">4 - Bueno</option>
-            <option value="5">5 - Excelente</option>
-          </select>
-
-          <label for="comment">Comentario:</label>
-          <textarea id="comment" name="comment" rows="4"></textarea>
-
-          <button type="submit">Enviar Evaluación</button>
-        </form>
-        <div id="previous-evaluations">
-          <h3>Evaluaciones anteriores</h3>
-          <div id="evaluations-list"></div>
-        </div>
+    <!-- Ventana tipo Center Peek -->
+    <div id="center-peek" class="center-peek hidden">
+      <div class="peek-content">
+        <span class="peek-close">&times;</span>
+        <div id="peek-body"></div>
       </div>
     </div>
     <script src="script.js"></script>
