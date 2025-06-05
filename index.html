@@ -7,24 +7,34 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <!-- Login -->
+    <!-- Login Section -->
     <section id="login-section">
-      <h2>Iniciar Sesión</h2>
-      <form id="login-form">
-        <input type="text" id="login-username" placeholder="Usuario" required />
-        <input
-          type="password"
-          id="login-password"
-          placeholder="Contraseña"
-          required
-        />
-        <button type="submit">Entrar</button>
-      </form>
-      <p id="login-error" style="color: red; display: none"></p>
+      <header>
+        <h1>Evaluación de Profesores</h1>
+      </header>
+      <div class="login-container">
+        <h2>Iniciar Sesión</h2>
+        <form id="login-form">
+          <input
+            type="text"
+            id="login-username"
+            placeholder="Usuario"
+            required
+          />
+          <input
+            type="password"
+            id="login-password"
+            placeholder="Contraseña"
+            required
+          />
+          <button type="submit">Entrar</button>
+        </form>
+        <p id="login-error" style="color: red; display: none"></p>
+      </div>
     </section>
 
-    <!-- Contenido Principal -->
-    <section id="main-section" class="hidden">
+    <!-- Career Selection Section -->
+    <section id="career-section" class="hidden">
       <div
         style="
           display: flex;
@@ -38,28 +48,69 @@
       </div>
 
       <header>
-        <h1>Evaluación de Profesores - Ingeniería Civil</h1>
+        <h1>Evaluación de Profesores</h1>
       </header>
 
-      <main>
-        <section id="curriculum">
-          <div class="course" data-course="calculo-diferencial">
-            Cálculo Diferencial
+      <div class="career-canvas-selector">
+        <h2>Selecciona tu carrera</h2>
+        <div class="career-grid">
+          <div class="career-card" onclick="loadCareer('civil')">
+            <img src="assets/civil_icon.jpg" alt="Ingeniería Civil" />
+            <p>Ingeniería Civil</p>
           </div>
-          <div class="course" data-course="geometria">Geometría</div>
-        </section>
-      </main>
-
-      <!-- Ventana tipo Center Peek -->
-      <div id="center-peek" class="center-peek hidden">
-        <div class="peek-content">
-          <span class="peek-close">&times;</span>
-          <div id="peek-body"></div>
+          <div class="career-card" onclick="loadCareer('sistemas')">
+            <img src="assets/sistemas_icon.jpg" alt="Ingeniería de Sistemas" />
+            <p>Ingeniería de Sistemas</p>
+          </div>
+          <!-- Agrega más carreras aquí -->
         </div>
       </div>
     </section>
 
-    <!-- Script principal -->
+    <!-- Main Content Section (Curriculum) -->
+    <section id="main-section" class="hidden">
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 10px;
+        "
+      >
+        <div id="user-display-main" style="font-weight: bold"></div>
+        <button id="logout-button-main">Cerrar sesión</button>
+      </div>
+
+      <header>
+        <h1 id="career-title">Evaluación de Profesores</h1>
+      </header>
+
+      <main>
+        <section id="curriculum">
+          <!-- Contenido dinámico de materias -->
+        </section>
+      </main>
+    </section>
+
+    <!-- Fullscreen Modal for Career Selection -->
+    <div id="careerModal" class="modal">
+      <div class="modal-fullscreen-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <h2 class="modal-title">Escoge las materias</h2>
+        <div id="modalBody" class="modal-body">
+          <!-- Contenido dinámico aquí -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Center Peek Modal for Professor Evaluation -->
+    <div id="center-peek" class="center-peek hidden">
+      <div class="peek-content">
+        <span class="peek-close">&times;</span>
+        <div id="peek-body"></div>
+      </div>
+    </div>
+
     <script src="script.js"></script>
   </body>
 </html>

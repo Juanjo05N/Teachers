@@ -1,6 +1,9 @@
+// Variables globales
 let currentCourse = null;
 let currentUser = null;
+let currentCareer = null;
 
+// Inicializar usuarios por defecto
 let users = JSON.parse(localStorage.getItem("usuarios") || "{}");
 
 if (!users["admin"]) {
@@ -8,6 +11,7 @@ if (!users["admin"]) {
   localStorage.setItem("usuarios", JSON.stringify(users));
 }
 
+// Login functionality
 document.getElementById("login-form").onsubmit = function (e) {
   e.preventDefault();
   const username = document.getElementById("login-username").value.trim();
@@ -31,7 +35,7 @@ document.getElementById("login-form").onsubmit = function (e) {
     document.getElementById(
       "user-display"
     ).textContent = `Usuario: ${username}`;
-    showMainSection();
+    showCareerSection();
   } else if (users[username] !== password) {
     document.getElementById("login-error").textContent =
       "Contraseña incorrecta.";
@@ -44,36 +48,209 @@ document.getElementById("login-form").onsubmit = function (e) {
         ? `<span class="admin-name">Administrador</span>`
         : `Usuario: ${username}`;
 
-    showMainSection();
+    showCareerSection();
   }
 };
 
-function showMainSection() {
+// Show career selection section
+function showCareerSection() {
   document.getElementById("login-section").classList.add("hidden");
-  document.getElementById("main-section").classList.remove("hidden");
+  document.getElementById("career-section").classList.remove("hidden");
+  document.getElementById("main-section").classList.add("hidden");
 }
 
-document.getElementById("logout-button").addEventListener("click", () => {
-  localStorage.removeItem("usuarioActivo"); // Borra el usuario activo (si lo usas)
+// Show main section (curriculum)
+function showMainSection(careerName) {
+  document.getElementById("login-section").classList.add("hidden");
+  document.getElementById("career-section").classList.add("hidden");
+  document.getElementById("main-section").classList.remove("hidden");
+
+  // Update career title and user display in main section
+  document.getElementById(
+    "career-title"
+  ).textContent = `Evaluación de Profesores - ${careerName}`;
+  document.getElementById("user-display-main").innerHTML =
+    currentUser === "admin"
+      ? `<span class="admin-name">Administrador</span>`
+      : `Usuario: ${currentUser}`;
+}
+
+// Logout functionality
+function setupLogoutButtons() {
+  document.getElementById("logout-button").addEventListener("click", logout);
+  document
+    .getElementById("logout-button-main")
+    .addEventListener("click", logout);
+}
+
+function logout() {
+  localStorage.removeItem("usuarioActivo");
+  currentUser = null;
+  currentCareer = null;
+  currentCourse = null;
+
+  // Reset form
+  document.getElementById("login-form").reset();
+  document.getElementById("login-error").style.display = "none";
+
+  // Show login section
   document.getElementById("main-section").classList.add("hidden");
+  document.getElementById("career-section").classList.add("hidden");
   document.getElementById("login-section").classList.remove("hidden");
-});
 
-document.querySelectorAll(".course").forEach((course) => {
-  course.addEventListener("click", () => {
-    currentCourse = course.dataset.course;
-    showProfessorsForCourse(currentCourse);
+  // Close any open modals
+  closeModal();
+  closePeek();
+}
+
+// Career loading functionality
+function loadCareer(career) {
+  currentCareer = career;
+  const modal = document.getElementById("careerModal");
+  const modalBody = document.getElementById("modalBody");
+
+  if (career === "civil") {
+    modalBody.innerHTML = `
+      <h3>Ingeniería Civil</h3>
+      <div class="malla-container">
+        <img src="assets/civil_malla.jpg" alt="Mapa Ingeniería Civil">
+        
+        <!-- Materias clickeables con coordenadas aproximadas -->
+        <div class="materia" style="top: 115px; left: 15px;" data-course="calculo-diferencial"></div>
+        <div class="materia" style="top: 205px; left: 15px;" data-course="geometria"></div>
+        <div class="materia" style="top: 295px; left: 15px;" data-course="biologia-i"></div>
+        <div class="materia" style="top: 383px; left: 15px;" data-course="quimica-general"></div>
+        <div class="materia" style="top: 472px; left: 15px;" data-course="programacion"></div>
+        <div class="materia" style="top: 650px; left: 15px;" data-course="comunicacion-ciencia"></div>
+        <div class="materia" style="top: 740px; left: 15px;" data-course="introduccion-ingenieria"></div>
+      </div>
+    `;
+
+    // Activar clics en las materias
+    setTimeout(() => {
+      document.querySelectorAll(".materia").forEach((materia) => {
+        materia.addEventListener("click", () => {
+          const courseName = getCourseDisplayName(materia.dataset.course);
+          currentCourse = materia.dataset.course;
+          closeModal();
+          showMainSection("Ingeniería Civil");
+
+          // Crear curriculum dinámico para esta carrera
+          createCurriculumForCareer("civil");
+
+          // Abrir directamente la evaluación de profesores para esta materia
+          setTimeout(() => {
+            showProfessorsForCourse(currentCourse);
+          }, 100);
+        });
+      });
+    }, 0);
+  } else if (career === "sistemas") {
+    modalBody.innerHTML = `
+      <h3>Ingeniería de Sistemas</h3>
+      <div class="malla-container">
+        <p>Malla curricular de Ingeniería de Sistemas próximamente...</p>
+        <!-- Aquí puedes agregar la malla de sistemas cuando esté disponible -->
+        <div style="margin-top: 20px;">
+          <div class="course" data-course="programacion-basica" style="display: inline-block; margin: 10px; padding: 15px; background: #cce5ff; border-radius: 8px; cursor: pointer;">
+            Programación Básica
+          </div>
+          <div class="course" data-course="estructuras-datos" style="display: inline-block; margin: 10px; padding: 15px; background: #cce5ff; border-radius: 8px; cursor: pointer;">
+            Estructuras de Datos
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Activar clics para sistemas
+    setTimeout(() => {
+      modalBody.querySelectorAll(".course").forEach((course) => {
+        course.addEventListener("click", () => {
+          currentCourse = course.dataset.course;
+          closeModal();
+          showMainSection("Ingeniería de Sistemas");
+          createCurriculumForCareer("sistemas");
+          setTimeout(() => {
+            showProfessorsForCourse(currentCourse);
+          }, 100);
+        });
+      });
+    }, 0);
+  } else {
+    modalBody.innerHTML = `
+      <h3>Carrera no disponible</h3>
+      <p>Esta carrera estará disponible próximamente.</p>
+    `;
+  }
+
+  // Mostrar el modal
+  modal.style.display = "block";
+}
+
+// Crear curriculum dinámico basado en la carrera
+function createCurriculumForCareer(career) {
+  const curriculum = document.getElementById("curriculum");
+
+  if (career === "civil") {
+    curriculum.innerHTML = `
+      <div class="course" data-course="calculo-diferencial">Cálculo Diferencial</div>
+      <div class="course" data-course="geometria">Geometría</div>
+      <div class="course" data-course="biologia-i">Biología I</div>
+      <div class="course" data-course="quimica-general">Química General e Inorgánica</div>
+      <div class="course" data-course="programacion">Fundamentos de Programación</div>
+      <div class="course" data-course="comunicacion-ciencia">Comunicación y Ciencia</div>
+      <div class="course" data-course="introduccion-ingenieria">Introducción a la Ingeniería</div>
+    `;
+  } else if (career === "sistemas") {
+    curriculum.innerHTML = `
+      <div class="course" data-course="programacion-basica">Programación Básica</div>
+      <div class="course" data-course="estructuras-datos">Estructuras de Datos</div>
+    `;
+  }
+
+  // Agregar event listeners a las materias
+  curriculum.querySelectorAll(".course").forEach((course) => {
+    course.addEventListener("click", () => {
+      currentCourse = course.dataset.course;
+      showProfessorsForCourse(currentCourse);
+    });
   });
-});
+}
 
+// Obtener nombre legible de la materia
+function getCourseDisplayName(courseId) {
+  const courseNames = {
+    "calculo-diferencial": "Cálculo Diferencial",
+    geometria: "Geometría",
+    "biologia-i": "Biología I",
+    "quimica-general": "Química General e Inorgánica",
+    programacion: "Fundamentos de Programación",
+    "comunicacion-ciencia": "Comunicación y Ciencia",
+    "introduccion-ingenieria": "Introducción a la Ingeniería",
+    "programacion-basica": "Programación Básica",
+    "estructuras-datos": "Estructuras de Datos",
+  };
+
+  return courseNames[courseId] || courseId.replace("-", " ");
+}
+
+// Modal control functions
+function closeModal() {
+  const modal = document.getElementById("careerModal");
+  modal.style.display = "none";
+}
+
+// Center peek functionality
 const peek = document.getElementById("center-peek");
 const peekBody = document.getElementById("peek-body");
 const peekClose = document.querySelector(".peek-close");
 
-peekClose.onclick = () => {
+peekClose.onclick = closePeek;
+
+function closePeek() {
   peek.classList.add("hidden");
   peekBody.innerHTML = "";
-};
+}
 
 function showProfessorsForCourse(courseId) {
   const allData = JSON.parse(localStorage.getItem("evaluaciones") || "{}");
@@ -85,10 +262,12 @@ function showProfessorsForCourse(courseId) {
     grouped[e.profesor].push(e);
   });
 
+  const courseName = getCourseDisplayName(courseId);
+
   peekBody.innerHTML = `
-    <h2>Profesores de ${courseId.replace("-", " ")}</h2>
-    <button onclick="newProfessorForm()">+ Nuevo Profesor</button>
-    <div style="margin-top: 20px;"></div>`;
+    <h2>Profesores de ${courseName}</h2>
+    <button onclick="newProfessorForm()" style="float: right; margin-bottom: 20px;">+ Nuevo Profesor</button>
+    <div style="clear: both; margin-top: 20px;"></div>`;
 
   Object.entries(grouped).forEach(([prof, evals]) => {
     const avg =
@@ -97,12 +276,16 @@ function showProfessorsForCourse(courseId) {
 
     const profBox = document.createElement("div");
     profBox.innerHTML = `
-      <div style="padding:10px; border:1px solid #ccc; border-radius:8px; margin-bottom:10px; cursor:pointer;">
-        <strong style="font-size:18px;">${prof}</strong>
-        <div>${stars} (${avg.toFixed(1)}/5)</div>
+      <div style="padding:15px; border:1px solid #ccc; border-radius:8px; margin-bottom:15px; cursor:pointer; transition: box-shadow 0.2s;">
+        <strong style="font-size:20px;">${prof}</strong>
+        <div style="margin-top: 8px;">${stars} (${avg.toFixed(1)}/5)</div>
       </div>
     `;
     profBox.onclick = () => viewProfessorDetails(prof);
+    profBox.onmouseover = () =>
+      (profBox.firstElementChild.style.boxShadow = "0 4px 8px rgba(0,0,0,0.1)");
+    profBox.onmouseout = () =>
+      (profBox.firstElementChild.style.boxShadow = "none");
     peekBody.appendChild(profBox);
   });
 
@@ -129,7 +312,7 @@ function getStarsHTML(score) {
   return `<span class="stars">${html}</span>`;
 }
 
-function setPeekHeader(showBackArrow = true) {
+function setPeekHeader(title, showBackArrow = true) {
   const headerHTML = `
     <div class="peek-header">
       ${
@@ -137,6 +320,8 @@ function setPeekHeader(showBackArrow = true) {
           ? `<span class="back-arrow" onclick="showProfessorsForCourse(currentCourse)">← Volver</span>`
           : `<span></span>`
       }
+      <h2 style="margin: 0;">${title}</h2>
+      <span></span>
     </div>
   `;
   return headerHTML;
@@ -151,8 +336,6 @@ function newProfessorForm() {
 
   peekBody.innerHTML = `
   ${setPeekHeader("Nuevo Profesor")}
-  <div class="peek-header">
-  </div>
   <form id="nuevo-profesor-form">
     <label>Nombre del Profesor:</label>
     <input type="text" id="nuevo-nombre" required />
@@ -308,19 +491,19 @@ function viewProfessorDetails(nombreProfesor) {
   peekBody.innerHTML = `
   ${setPeekHeader(nombreProfesor)}
   <div class="peek-header">
-    <h2 style="margin: 0;">${nombreProfesor}</h2>
+    <span></span>
     <button onclick="calificarProfesor('${nombreProfesor.replace(
       /'/g,
       "\\'"
-    )}')">+ Calificar Profesor</button>
+    )}')" style="background: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer;">+ Calificar Profesor</button>
   </div>
   <p><strong>Promedio:</strong> ${estrellas} (${promedio.toFixed(1)}/5)</p>
   <hr />
   <div id="comentarios-lista">
     ${delProfesor
       .map(
-        (e) => `
-<div style="border: 1px solid #ccc; padding: 10px; border-radius: 6px; margin-bottom: 10px; position: relative;">
+        (e, index) => `
+<div style="border: 1px solid #ccc; padding: 15px; border-radius: 8px; margin-bottom: 15px; position: relative;">
   <strong>Calificación:</strong> ${getStarsHTML(e.calificacion)} (${
           e.calificacion
         }/5)<br />
@@ -329,11 +512,10 @@ function viewProfessorDetails(nombreProfesor) {
     currentUser === "admin"
       ? `<button onclick="eliminarReseña('${currentCourse}', '${nombreProfesor}', ${evaluations.indexOf(
           e
-        )})" style="position: absolute; top: 5px; right: 5px; background-color: red; color: white; border: none; border-radius: 4px; padding: 4px;">🗑️</button>`
+        )})" style="position: absolute; top: 10px; right: 10px; background-color: #dc3545; color: white; border: none; border-radius: 4px; padding: 6px 8px; cursor: pointer;">🗑️</button>`
       : ""
   }
 </div>
-
     `
       )
       .join("")}
@@ -343,11 +525,16 @@ function viewProfessorDetails(nombreProfesor) {
   peek.classList.remove("hidden");
 }
 
+// Initialize the application
 window.addEventListener("DOMContentLoaded", () => {
+  // Setup logout button event listeners
+  setupLogoutButtons();
+
+  // Check if user is already logged in
   const usuarioActivo = localStorage.getItem("usuarioActivo");
   if (usuarioActivo) {
     currentUser = usuarioActivo;
-    showMainSection();
+    showCareerSection();
     document.getElementById("user-display").innerHTML =
       usuarioActivo === "admin"
         ? `<span class="admin-name">Administrador</span>`
