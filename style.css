@@ -127,11 +127,14 @@ header {
 /* Cajas invisibles sobre las materias */
 .materia {
   position: absolute;
-  width: 120px;
-  height: 40px;
+  width: 85px;
+  height: 55px;
   cursor: pointer;
-  border: 2px solid transparent;
+  border: 2px solid red;
+  background-color: rgba(255, 0, 0, 0.2);
+  z-index: 10;
 }
+
 
 .materia:hover {
   border: 2px solid #007bff;
