@@ -8,17 +8,24 @@
 </head>
 <body>
   <header>
-    <h1>Evaluación de Profesores - Ingeniería Civil</h1>
+    <h1>Evaluación de Profesores</h1>
   </header>
+  <div class="career-selector">
+  <label for="career">Selecciona tu carrera:</label>
+  <select id="career" onchange="loadCareer()">
+    <option value="">-- Elige una carrera --</option>
+    <option value="civil">Ingeniería Civil</option>
+    <option value="sistemas">Ingeniería de Sistemas</option>
+    <!-- Agrega más opciones según sea necesario -->
+  </select>
+</div>
 
-  <main>
-    <section id="curriculum">
-      <!-- We'll insert the curriculum map here (basic version first) -->
-      <div class="course" data-course="calculo-diferencial">Cálculo Diferencial</div>
-      <div class="course" data-course="geometria">Geometría</div>
-      <!-- Add more later -->
-    </section>
-  </main>
+<div id="career-canvas" class="career-canvas">
+  <!-- Aquí se cargará el contenido de la carrera seleccionada -->
+</div>
+
+
+
 
   <script src="script.js"></script>
 </body>

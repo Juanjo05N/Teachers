@@ -32,3 +32,18 @@ header {
 .course:hover {
   background: #99ccff;
 }
+
+.career-selector {
+  margin: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.career-selector label {
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.career-canvas {
+  margin-top: 30px;
+  text-align: center;
+}
