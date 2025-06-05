@@ -1,4 +1,63 @@
 let currentCourse = null;
+let currentUser = null;
+
+let users = JSON.parse(localStorage.getItem("usuarios") || "{}");
+
+if (!users["admin"]) {
+  users["admin"] = "admin123";
+  localStorage.setItem("usuarios", JSON.stringify(users));
+}
+
+document.getElementById("login-form").onsubmit = function (e) {
+  e.preventDefault();
+  const username = document.getElementById("login-username").value.trim();
+  const password = document.getElementById("login-password").value;
+
+  let users = JSON.parse(localStorage.getItem("usuarios") || "{}");
+
+  if (!users[username]) {
+    if (username === "admin") {
+      document.getElementById("login-error").textContent =
+        "No puedes registrar el usuario 'admin'.";
+      document.getElementById("login-error").style.display = "block";
+      return;
+    }
+
+    // Registro automático
+    users[username] = password;
+    localStorage.setItem("usuarios", JSON.stringify(users));
+    currentUser = username;
+    localStorage.setItem("usuarioActivo", username);
+    document.getElementById(
+      "user-display"
+    ).textContent = `Usuario: ${username}`;
+    showMainSection();
+  } else if (users[username] !== password) {
+    document.getElementById("login-error").textContent =
+      "Contraseña incorrecta.";
+    document.getElementById("login-error").style.display = "block";
+  } else {
+    currentUser = username;
+    localStorage.setItem("usuarioActivo", username);
+    document.getElementById("user-display").innerHTML =
+      username === "admin"
+        ? `<span class="admin-name">Administrador</span>`
+        : `Usuario: ${username}`;
+
+    showMainSection();
+  }
+};
+
+function showMainSection() {
+  document.getElementById("login-section").classList.add("hidden");
+  document.getElementById("main-section").classList.remove("hidden");
+}
+
+document.getElementById("logout-button").addEventListener("click", () => {
+  localStorage.removeItem("usuarioActivo"); // Borra el usuario activo (si lo usas)
+  document.getElementById("main-section").classList.add("hidden");
+  document.getElementById("login-section").classList.remove("hidden");
+});
 
 document.querySelectorAll(".course").forEach((course) => {
   course.addEventListener("click", () => {
@@ -51,10 +110,23 @@ function showProfessorsForCourse(courseId) {
 }
 
 function getStarsHTML(score) {
-  const full = Math.floor(score);
-  const half = score - full >= 0.5 ? 1 : 0;
-  const empty = 5 - full - half;
-  return "★".repeat(full) + (half ? "½" : "") + "☆".repeat(empty);
+  const fullStars = Math.floor(score);
+  const halfStar = score % 1 >= 0.5 ? 1 : 0;
+  const emptyStars = 5 - fullStars - halfStar;
+
+  let html = "";
+
+  for (let i = 0; i < fullStars; i++) {
+    html += '<span class="star full">★</span>';
+  }
+  if (halfStar) {
+    html += '<span class="star half">★</span>';
+  }
+  for (let i = 0; i < emptyStars; i++) {
+    html += '<span class="star empty">★</span>';
+  }
+
+  return `<span class="stars">${html}</span>`;
 }
 
 function setPeekHeader(showBackArrow = true) {
@@ -121,6 +193,7 @@ function newProfessorForm() {
       profesor: nombre,
       calificacion,
       comentario,
+      usuario: currentUser,
     };
 
     if (!allData[currentCourse]) {
@@ -133,6 +206,90 @@ function newProfessorForm() {
     alert("¡Profesor agregado exitosamente!");
     showProfessorsForCourse(currentCourse); // Volver a lista
   };
+}
+
+function calificarProfesor(nombreProfesor) {
+  const allData = JSON.parse(localStorage.getItem("evaluaciones") || "{}");
+  const cursoData = allData[currentCourse] || [];
+
+  const yaEvaluo = cursoData.some(
+    (e) =>
+      e.profesor.toLowerCase() === nombreProfesor.toLowerCase() &&
+      e.usuario === currentUser
+  );
+
+  if (yaEvaluo) {
+    alert("Ya has evaluado a este profesor en esta materia.");
+    return;
+  }
+
+  peekBody.innerHTML = `
+    ${setPeekHeader("Calificar a " + nombreProfesor)}
+    <form id="calificar-profesor-form">
+      <label>Nombre del Profesor:</label>
+      <input type="text" id="calificar-nombre" value="${nombreProfesor}" disabled />
+
+      <label>Calificación (1-5):</label>
+      <select id="calificar-calificacion" required>
+        <option value="">Selecciona</option>
+        <option value="1">1 - Muy Malo</option>
+        <option value="2">2 - Malo</option>
+        <option value="3">3 - Regular</option>
+        <option value="4">4 - Bueno</option>
+        <option value="5">5 - Excelente</option>
+      </select>
+
+      <label>Comentario:</label>
+      <textarea id="calificar-comentario" rows="4"></textarea>
+
+      <button type="submit">Enviar Evaluación</button>
+    </form>
+  `;
+
+  document
+    .getElementById("calificar-profesor-form")
+    .addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const calificacion = parseInt(
+        document.getElementById("calificar-calificacion").value
+      );
+      const comentario = document.getElementById("calificar-comentario").value;
+
+      const allData = JSON.parse(localStorage.getItem("evaluaciones") || "{}");
+      const cursoData = allData[currentCourse] || [];
+
+      cursoData.push({
+        profesor: nombreProfesor,
+        calificacion,
+        comentario,
+        usuario: currentUser,
+      });
+
+      allData[currentCourse] = cursoData;
+      localStorage.setItem("evaluaciones", JSON.stringify(allData));
+
+      alert("¡Gracias por tu evaluación!");
+      showProfessorsForCourse(currentCourse);
+    });
+
+  peek.classList.remove("hidden");
+}
+
+function eliminarReseña(curso, profesor, index) {
+  if (!confirm("¿Estás seguro de que deseas eliminar esta reseña?")) return;
+
+  const data = JSON.parse(localStorage.getItem("evaluaciones") || "{}");
+  const cursoData = data[curso] || [];
+
+  const nuevas = cursoData.filter((e, i) => {
+    const esEste = i === index && e.profesor === profesor;
+    return !esEste;
+  });
+
+  data[curso] = nuevas;
+  localStorage.setItem("evaluaciones", JSON.stringify(data));
+  viewProfessorDetails(profesor);
 }
 
 function viewProfessorDetails(nombreProfesor) {
@@ -163,12 +320,20 @@ function viewProfessorDetails(nombreProfesor) {
     ${delProfesor
       .map(
         (e) => `
-      <div style="border: 1px solid #ccc; padding: 10px; border-radius: 6px; margin-bottom: 10px;">
-        <strong>Calificación:</strong> ${getStarsHTML(e.calificacion)} (${
+<div style="border: 1px solid #ccc; padding: 10px; border-radius: 6px; margin-bottom: 10px; position: relative;">
+  <strong>Calificación:</strong> ${getStarsHTML(e.calificacion)} (${
           e.calificacion
         }/5)<br />
-        <strong>Comentario:</strong> ${e.comentario || "(Sin comentario)"}
-      </div>
+  <strong>Comentario:</strong> ${e.comentario || "(Sin comentario)"}
+  ${
+    currentUser === "admin"
+      ? `<button onclick="eliminarReseña('${currentCourse}', '${nombreProfesor}', ${evaluations.indexOf(
+          e
+        )})" style="position: absolute; top: 5px; right: 5px; background-color: red; color: white; border: none; border-radius: 4px; padding: 4px;">🗑️</button>`
+      : ""
+  }
+</div>
+
     `
       )
       .join("")}
@@ -177,3 +342,13 @@ function viewProfessorDetails(nombreProfesor) {
 
   peek.classList.remove("hidden");
 }
+
+window.addEventListener("DOMContentLoaded", () => {
+  const usuarioActivo = localStorage.getItem("usuarioActivo");
+  if (usuarioActivo) {
+    currentUser = usuarioActivo;
+    showMainSection();
+    document.getElementById("user-display").textContent =
+      usuarioActivo === "admin" ? "Administrador" : `Usuario: ${usuarioActivo}`;
+  }
+});

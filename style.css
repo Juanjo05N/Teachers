@@ -12,6 +12,15 @@ header {
   text-align: center;
 }
 
+.admin-name {
+  color: purple;
+  font-weight: bold;
+}
+
+.hidden {
+  display: none;
+}
+
 #curriculum {
   display: flex;
   flex-wrap: wrap;
@@ -83,4 +92,33 @@ header {
   font-size: 18px;
   color: #003366;
   font-weight: bold;
+}
+
+.stars .star {
+  font-size: 24px; /* tamaño más grande */
+  margin-right: 2px;
+}
+
+.star.full {
+  color: gold;
+}
+
+.star.half {
+  color: lightgray; /* fondo base gris */
+  position: relative;
+  display: inline-block;
+}
+
+.star.half::before {
+  content: "★";
+  color: gold;
+  position: absolute;
+  left: 0;
+  width: 50%;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.star.empty {
+  color: lightgray;
 }
