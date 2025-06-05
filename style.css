@@ -98,3 +98,28 @@ header {
   font-size: 22px;
   cursor: pointer;
 }
+
+#previous-evaluations {
+  margin-top: 20px;
+  border-top: 1px solid #ccc;
+  padding-top: 10px;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.prof-evaluation {
+  margin-bottom: 10px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 8px;
+}
+
+.prof-evaluation h4 {
+  margin: 0;
+  font-size: 16px;
+  color: #003366;
+}
+
+.stars {
+  color: #f5c518;
+  font-size: 18px;
+}

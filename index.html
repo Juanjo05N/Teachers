@@ -27,6 +27,12 @@
         <span class="close-button">&times;</span>
         <h2>Evaluar Profesor</h2>
         <form id="evaluation-form">
+          <label for="existing-professors"
+            >Selecciona un Profesor existente:</label
+          >
+          <select id="existing-professors">
+            <option value="">-- Otro / Nuevo --</option>
+          </select>
           <label for="professor-name">Nombre del Profesor:</label>
           <input
             type="text"
@@ -50,6 +56,10 @@
 
           <button type="submit">Enviar Evaluación</button>
         </form>
+        <div id="previous-evaluations">
+          <h3>Evaluaciones anteriores</h3>
+          <div id="evaluations-list"></div>
+        </div>
       </div>
     </div>
     <script src="script.js"></script>
