@@ -6,44 +6,108 @@ body {
 }
 
 header {
-  background: #003366;
+  background: #3990e7;
   color: white;
   padding: 10px;
   text-align: center;
 }
 
-#curriculum {
+.career-canvas-selector {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.career-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 20px;
+  justify-content: center;
+  gap: 20px;
+  padding: 20px;
 }
 
-.course {
-  background: #cce5ff;
-  padding: 15px;
-  border-radius: 8px;
+.career-card {
+  background-color: #f0f0f0;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  width: 180px;
   cursor: pointer;
-  flex: 1 1 200px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  padding: 10px;
   text-align: center;
-  transition: background 0.2s;
 }
 
-.course:hover {
-  background: #99ccff;
+.career-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
 }
 
-.career-selector {
-  margin: 20px;
-  font-family: Arial, sans-serif;
+.career-card img {
+  width: 100%;
+  height: 120px;
+  object-fit: contain;
+  margin-bottom: 10px;
 }
 
-.career-selector label {
+.career-card p {
   font-weight: bold;
-  margin-right: 10px;
+  font-size: 16px;
 }
 
-.career-canvas {
-  margin-top: 30px;
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: white;
+  overflow-y: auto;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.modal-fullscreen-content {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 20px;
+  position: relative;
+}
+
+.close-btn {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  font-size: 32px;
+  font-weight: bold;
+  color: #444;
+  cursor: pointer;
+  z-index: 10000;
+}
+
+.close-btn:hover {
+  transform: scale(1.2);
+  color: rgb(255, 0, 0);
+}
+
+.modal-title {
   text-align: center;
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+
+.modal-body {
+  text-align: center;
+}
+
+.modal-body img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+/* Optional fade-in animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }

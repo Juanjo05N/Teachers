@@ -10,20 +10,31 @@
   <header>
     <h1>Evaluación de Profesores</h1>
   </header>
-  <div class="career-selector">
-  <label for="career">Selecciona tu carrera:</label>
-  <select id="career" onchange="loadCareer()">
-    <option value="">-- Elige una carrera --</option>
-    <option value="civil">Ingeniería Civil</option>
-    <option value="sistemas">Ingeniería de Sistemas</option>
-    <!-- Agrega más opciones según sea necesario -->
-  </select>
+<div class="career-canvas-selector">
+  <h2>Selecciona tu carrera</h2>
+  <div class="career-grid">
+    <div class="career-card" onclick="loadCareer('civil')">
+      <img src="assets/civil_icon.jpg" alt="Ingeniería Civil">
+      <p>Ingeniería Civil</p>
+    </div>
+    <div class="career-card" onclick="loadCareer('sistemas')">
+      <img src="assets/sistemas_icon.jpg" alt="Ingeniería de Sistemas">
+      <p>Ingeniería de Sistemas</p>
+    </div>
+    <!-- Agrega más carreras aquí -->
+  </div>
 </div>
 
-<div id="career-canvas" class="career-canvas">
-  <!-- Aquí se cargará el contenido de la carrera seleccionada -->
+<!-- Fullscreen Modal -->
+<div id="careerModal" class="modal">
+  <div class="modal-fullscreen-content">
+    <span class="close-btn" onclick="closeModal()">&times;</span>
+    <h2 class="modal-title">Escoge las materias</h2>
+    <div id="modalBody" class="modal-body">
+      <!-- Contenido dinámico aquí -->
+    </div>
+  </div>
 </div>
-
 
 
 
