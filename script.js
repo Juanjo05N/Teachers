@@ -348,7 +348,9 @@ window.addEventListener("DOMContentLoaded", () => {
   if (usuarioActivo) {
     currentUser = usuarioActivo;
     showMainSection();
-    document.getElementById("user-display").textContent =
-      usuarioActivo === "admin" ? "Administrador" : `Usuario: ${usuarioActivo}`;
+    document.getElementById("user-display").innerHTML =
+      usuarioActivo === "admin"
+        ? `<span class="admin-name">Administrador</span>`
+        : `Usuario: ${usuarioActivo}`;
   }
 });
